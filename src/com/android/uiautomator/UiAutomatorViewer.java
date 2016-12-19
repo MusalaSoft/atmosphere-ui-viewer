@@ -17,8 +17,9 @@
 package com.android.uiautomator;
 
 import com.android.uiautomator.actions.OpenFilesAction;
-import com.android.uiautomator.actions.SaveScreenShotAction;
 import com.android.uiautomator.actions.ScreenshotAction;
+
+import java.io.File;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.window.ApplicationWindow;
@@ -33,8 +34,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
-import java.io.File;
-
+//@Server(connectionRetryLimit = 0, ip = "localhost", port = 1980)
 public class UiAutomatorViewer extends ApplicationWindow {
     private UiAutomatorView mUiAutomatorView;
     public UiAutomatorViewer() {
@@ -56,10 +56,11 @@ public class UiAutomatorViewer extends ApplicationWindow {
         c.setLayoutData(gd);
 
         ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT);
+        
         toolBarManager.add(new OpenFilesAction(this));
         toolBarManager.add(new ScreenshotAction(this,false));
-        toolBarManager.add(new ScreenshotAction(this,true));
-        toolBarManager.add(new SaveScreenShotAction(this));
+        //toolBarManager.add(new ScreenshotAction(this,true));
+        //toolBarManager.add(new SaveScreenShotAction(this));
         ToolBar tb = toolBarManager.createControl(c);
         tb.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -86,7 +87,10 @@ public class UiAutomatorViewer extends ApplicationWindow {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("UI Automator Viewer");
+        newShell.setText("Atmosphere Viewer");
+        
+        Image iconImage = new Image(newShell.getDisplay(), "src/images/validator_logo.png");
+        newShell.setImage(iconImage);
     }
 
     @Override
