@@ -1,0 +1,45 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+version = '0.0.1'
+mainClassName = 'com.android.uiautomator.UiAutomatorViewer'
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Atmosphere UI Viewer',
+                   'Implementation-Version': version,
+                   'Main-Class': mainClassName
+    }
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+    maven {
+        url 'http://www.terracotta.org/download/reflector/releases/'
+    }
+    maven {
+        url 'http://download.osgeo.org/webdav/geotools/'
+    }
+}
+
+dependencies {
+    compile 'com.android.tools.ddms:ddmlib:25.1.3'
+    compile 'com.google.guava:guava:18.0'
+    compile 'org.javassist:javassist:3.18.2-GA'
+    compile 'org.reflections:reflections:0.9.9-RC1'
+    compile group: 'org.eclipse.core', name: 'commands', version: '3.3.0-I20070605-0010'
+    compile group: 'com.google.android', name: 'support-v4', version: 'r7'
+    compile group: 'org.eclipse', name: 'jface', version: '3.3.0-I20070606-0010'
+    compile group: 'org.eclipse.equinox', name: 'org.eclipse.equinox.common', version: '3.6.0'
+    compile group: 'org.eclipse', name: 'swt.win32.win32.x86_64', version: '3.6.1.v3655c'
+    compile 'commons-logging:commons-logging:1.2'
+    compile 'com.musala.atmosphere:atmosphere-client-server-lib:0.0.1'
+    compile 'com.musala.atmosphere:atmosphere-client:0.0.1'
+    compile 'com.musala.atmosphere:atmosphere-commons:0.0.1'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.13'
+}
