@@ -40,46 +40,58 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.android.uiautomator.UiAutomatorModel;
 import com.android.uiautomator.UiAutomatorViewer;
+import com.musala.atmosphere.client.ServerConnectionHandler;
 import com.musala.atmosphere.client.uiutils.ViewerCommunicator;
-import com.musala.atmosphere.client.util.Server;
+import com.musala.atmosphere.client.util.ServerConnectionProperties;
 import com.musala.atmosphere.commons.util.Pair;
+import com.musala.atmosphere.commons.util.PropertiesLoader;
 
-@Server(connectionRetryLimit = 0, ip = "localhost", port = 1980)
 public class ScreenshotAction extends Action {
     UiAutomatorViewer mViewer;
+
     private boolean mCompressed;
-    
+
     private ViewerCommunicator vCommunicator;
 
+    private ServerConnectionHandler serverConnectionHandler;
+
     public ScreenshotAction(UiAutomatorViewer viewer, boolean compressed) {
-        super("&Device Screenshot "+ (compressed ? "with Compressed Hierarchy" : "")
-                +"(uiautomator dump" + (compressed ? " --compressed)" : ")"));
+        super("&Device Screenshot " + (compressed ? "with Compressed Hierarchy" : "") + "(uiautomator dump"
+                + (compressed ? " --compressed)" : ")"));
         mViewer = viewer;
         mCompressed = compressed;
-        
+
         vCommunicator = new ViewerCommunicator();
+
+        PropertiesLoader loader = PropertiesLoader.getInstance("uiviewer.properties");
+
+        ServerConnectionProperties serverConnectionProperties = new ServerConnectionProperties(loader.getPropertyString("server.ip"),
+                                                                                               Integer.parseInt(loader.getPropertyString("server.port")),
+                                                                                               0);
+        serverConnectionHandler = new ServerConnectionHandler(serverConnectionProperties);
+        serverConnectionHandler.connect();
     }
 
     @Override
     public ImageDescriptor getImageDescriptor() {
-        if(mCompressed)
+        if (mCompressed)
             return ImageHelper.loadImageDescriptorFromResource("resources/screenshotcompressed.png");
         else
             return ImageHelper.loadImageDescriptorFromResource("resources/screenshot.png");
     }
-    
+
     @Override
     public void run() {
-    	UiAutomatorModel model;
-    	File uiXml = null;
-    	
-    	final String deviceSN = pickDevice();
+        UiAutomatorModel model;
+        File uiXml = null;
+
+        final String deviceSN = pickDevice();
         if (deviceSN == null) {
             return;
         }
-    	
-		uiXml = new File(vCommunicator.getUiHierarchy(deviceSN));
-		
+
+        uiXml = new File(vCommunicator.getUiHierarchy(deviceSN));
+
         try {
             model = new UiAutomatorModel(uiXml);
         } catch (Exception e) {
@@ -96,8 +108,7 @@ public class ScreenshotAction extends Action {
                 // "data" is an array, probably used to handle images that has multiple frames
                 // i.e. gifs or icons, we just care if it has at least one here
                 if (data.length < 1) {
-                    throw new RuntimeException("Unable to load image: "
-                            + screenshot.getAbsolutePath());
+                    throw new RuntimeException("Unable to load image: " + screenshot.getAbsolutePath());
                 }
 
                 img = new Image(Display.getDefault(), data[0]);
@@ -111,12 +122,12 @@ public class ScreenshotAction extends Action {
     }
 
     private String pickDevice() {
-        List<Pair<String,String>> devices = vCommunicator.getAvailableDevices();
-        
+        List<Pair<String, String>> devices = vCommunicator.getAvailableDevices();
+
         if (devices.size() == 0) {
             MessageDialog.openError(mViewer.getShell(),
-                    "Error obtaining Device Screenshot",
-                    "No Android devices were detected.");
+                                    "Error obtaining Device Screenshot",
+                                    "No Android devices were detected.");
             return null;
         } else if (devices.size() == 1) {
             return devices.get(0).getKey();
@@ -130,11 +141,13 @@ public class ScreenshotAction extends Action {
     }
 
     private static class DevicePickerDialog extends Dialog {
-        private final List<Pair<String,String>> mDevices;
+        private final List<Pair<String, String>> mDevices;
+
         private final String[] mDeviceNames;
+
         private static int sSelectedDeviceIndex;
 
-        public DevicePickerDialog(Shell parentShell, List<Pair<String,String>> devices) {
+        public DevicePickerDialog(Shell parentShell, List<Pair<String, String>> devices) {
             super(parentShell);
 
             mDevices = devices;
@@ -156,8 +169,7 @@ public class ScreenshotAction extends Action {
 
             final Combo combo = new Combo(c, SWT.BORDER | SWT.READ_ONLY);
             combo.setItems(mDeviceNames);
-            int defaultSelection =
-                    sSelectedDeviceIndex < mDevices.size() ? sSelectedDeviceIndex : 0;
+            int defaultSelection = sSelectedDeviceIndex < mDevices.size() ? sSelectedDeviceIndex : 0;
             combo.select(defaultSelection);
             sSelectedDeviceIndex = defaultSelection;
 

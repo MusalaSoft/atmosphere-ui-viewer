@@ -16,9 +16,6 @@
 
 package com.android.uiautomator;
 
-import com.android.uiautomator.actions.OpenFilesAction;
-import com.android.uiautomator.actions.ScreenshotAction;
-
 import java.io.File;
 
 import org.eclipse.jface.action.ToolBarManager;
@@ -34,9 +31,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
-//@Server(connectionRetryLimit = 0, ip = "localhost", port = 1980)
+import com.android.uiautomator.actions.OpenFilesAction;
+import com.android.uiautomator.actions.ScreenshotAction;
+
 public class UiAutomatorViewer extends ApplicationWindow {
     private UiAutomatorView mUiAutomatorView;
+
     public UiAutomatorViewer() {
         super(null);
     }
@@ -56,11 +56,11 @@ public class UiAutomatorViewer extends ApplicationWindow {
         c.setLayoutData(gd);
 
         ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT);
-        
+
         toolBarManager.add(new OpenFilesAction(this));
-        toolBarManager.add(new ScreenshotAction(this,false));
-        //toolBarManager.add(new ScreenshotAction(this,true));
-        //toolBarManager.add(new SaveScreenShotAction(this));
+        toolBarManager.add(new ScreenshotAction(this, false));
+        // toolBarManager.add(new ScreenshotAction(this,true));
+        // toolBarManager.add(new SaveScreenShotAction(this));
         ToolBar tb = toolBarManager.createControl(c);
         tb.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -88,7 +88,7 @@ public class UiAutomatorViewer extends ApplicationWindow {
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText("Atmosphere Viewer");
-        
+
         Image iconImage = new Image(newShell.getDisplay(), "resources/validator_logo.png");
         newShell.setImage(iconImage);
     }
@@ -98,8 +98,7 @@ public class UiAutomatorViewer extends ApplicationWindow {
         return new Point(800, 600);
     }
 
-    public void setModel(final UiAutomatorModel model, final File modelFile,
-                                                                final Image screenshot) {
+    public void setModel(final UiAutomatorModel model, final File modelFile, final Image screenshot) {
         if (Display.getDefault().getThread() != Thread.currentThread()) {
             Display.getDefault().syncExec(new Runnable() {
                 @Override
@@ -111,10 +110,12 @@ public class UiAutomatorViewer extends ApplicationWindow {
             mUiAutomatorView.setModel(model, modelFile, screenshot);
         }
     }
+
     public Image getScreenShot() {
         return mUiAutomatorView.getScreenShot();
     }
-    public File getModelFile(){
+
+    public File getModelFile() {
         return mUiAutomatorView.getModelFile();
     }
 }
