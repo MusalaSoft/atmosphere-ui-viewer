@@ -63,7 +63,7 @@ public class ScreenshotAction extends Action {
 
         vCommunicator = new ViewerCommunicator();
 
-        PropertiesLoader loader = PropertiesLoader.getInstance("uiviewer.properties");
+        PropertiesLoader loader = PropertiesLoader.getInstance("config.properties");
 
         ServerConnectionProperties serverConnectionProperties = new ServerConnectionProperties(loader.getPropertyString("server.ip"),
                                                                                                Integer.parseInt(loader.getPropertyString("server.port")),
