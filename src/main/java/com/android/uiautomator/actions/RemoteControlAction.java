@@ -1,22 +1,5 @@
-/*
- * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.android.uiautomator.actions;
 
-import java.io.File;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -27,18 +10,13 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import com.android.uiautomator.UiAutomatorModel;
 import com.android.uiautomator.UiAutomatorViewer;
 import com.musala.atmosphere.client.ServerConnectionHandler;
 import com.musala.atmosphere.client.uiutils.ViewerCommunicator;
@@ -46,20 +24,28 @@ import com.musala.atmosphere.client.util.ServerConnectionProperties;
 import com.musala.atmosphere.commons.util.Pair;
 import com.musala.atmosphere.commons.util.PropertiesLoader;
 
-public class ScreenshotAction extends Action {
+/**
+ * Class representing the remote control action. This class is extending the jface {@link Action} class.
+ * 
+ * @author yavor.stankov
+ *
+ */
+public class RemoteControlAction extends Action {
     UiAutomatorViewer mViewer;
-
-    private boolean mCompressed;
 
     private ViewerCommunicator vCommunicator;
 
     private ServerConnectionHandler serverConnectionHandler;
 
-    public ScreenshotAction(UiAutomatorViewer viewer, boolean compressed) {
-        super("&Device Screenshot " + (compressed ? "with Compressed Hierarchy" : "") + "(uiautomator dump"
-                + (compressed ? " --compressed)" : ")"));
+    /**
+     * Creates the remote control action by given {@link UiAutomatorViewer}.
+     * 
+     * @param viewer
+     *        - the given {@link UiAutomatorViewer}
+     */
+    public RemoteControlAction(UiAutomatorViewer viewer) {
+        super("Remote Control");
         mViewer = viewer;
-        mCompressed = compressed;
 
         vCommunicator = new ViewerCommunicator();
 
@@ -74,57 +60,23 @@ public class ScreenshotAction extends Action {
 
     @Override
     public ImageDescriptor getImageDescriptor() {
-        if (mCompressed)
-            return ImageHelper.loadImageDescriptorFromResource("resources/screenshotcompressed.png");
-        else
-            return ImageHelper.loadImageDescriptorFromResource("resources/screenshot.png");
+        return ImageHelper.loadImageDescriptorFromResource("resources/remote-control.png");
     }
 
     @Override
     public void run() {
-        UiAutomatorModel model;
-        File uiXml = null;
-
         final String deviceSN = pickDevice();
         if (deviceSN == null) {
             return;
         }
 
-        uiXml = new File(vCommunicator.getUiHierarchy(deviceSN));
-
-        try {
-            model = new UiAutomatorModel(uiXml);
-        } catch (Exception e) {
-            // FIXME: show error
-            return;
-        }
-
-        Image img = null;
-        File screenshot = new File(vCommunicator.getScreenshot(deviceSN));
-        if (screenshot != null) {
-            try {
-                ImageData[] data = new ImageLoader().load(screenshot.getAbsolutePath());
-
-                // "data" is an array, probably used to handle images that has multiple frames
-                // i.e. gifs or icons, we just care if it has at least one here
-                if (data.length < 1) {
-                    throw new RuntimeException("Unable to load image: " + screenshot.getAbsolutePath());
-                }
-
-                img = new Image(Display.getDefault(), data[0]);
-            } catch (Exception e) {
-                // FIXME: show error
-                return;
-            }
-        }
-
-        mViewer.setModel(model, img);
+        mViewer.setRemoteControlModel(deviceSN);
     }
 
     private String pickDevice() {
         List<Pair<String, String>> devices = vCommunicator.getAvailableDevices();
 
-        if (devices.size() == 0) {
+        if (devices.isEmpty()) {
             MessageDialog.openError(mViewer.getShell(),
                                     "Error obtaining Device Screenshot",
                                     "No Android devices were detected.");
@@ -132,11 +84,11 @@ public class ScreenshotAction extends Action {
         } else if (devices.size() == 1) {
             return devices.get(0).getKey();
         } else {
-            DevicePickerDialog dlg = new DevicePickerDialog(mViewer.getShell(), devices);
-            if (dlg.open() != Window.OK) {
+            DevicePickerDialog devicePickerDialog = new DevicePickerDialog(mViewer.getShell(), devices);
+            if (devicePickerDialog.open() != Window.OK) {
                 return null;
             }
-            return dlg.getSelectedDevice();
+            return devicePickerDialog.getSelectedDevice();
         }
     }
 
@@ -152,22 +104,24 @@ public class ScreenshotAction extends Action {
 
             mDevices = devices;
             mDeviceNames = new String[mDevices.size()];
-            for (int i = 0; i < devices.size(); i++) {
-                mDeviceNames[i] = String.format("%s-%s", devices.get(i).getValue(), devices.get(i).getKey());
+            for (int index = 0; index < devices.size(); index++) {
+                mDeviceNames[index] = String.format("%s-%s",
+                                                    devices.get(index).getValue(),
+                                                    devices.get(index).getKey());
             }
         }
 
         @Override
         protected Control createDialogArea(Composite parentShell) {
-            Composite parent = (Composite) super.createDialogArea(parentShell);
-            Composite c = new Composite(parent, SWT.NONE);
+            Composite parentComposite = (Composite) super.createDialogArea(parentShell);
+            Composite composite = new Composite(parentComposite, SWT.NONE);
 
-            c.setLayout(new GridLayout(2, false));
+            composite.setLayout(new GridLayout(2, false));
 
-            Label l = new Label(c, SWT.NONE);
-            l.setText("Select device: ");
+            Label label = new Label(composite, SWT.NONE);
+            label.setText("Select device: ");
 
-            final Combo combo = new Combo(c, SWT.BORDER | SWT.READ_ONLY);
+            final Combo combo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
             combo.setItems(mDeviceNames);
             int defaultSelection = sSelectedDeviceIndex < mDevices.size() ? sSelectedDeviceIndex : 0;
             combo.select(defaultSelection);
@@ -180,11 +134,17 @@ public class ScreenshotAction extends Action {
                 }
             });
 
-            return parent;
+            return parentComposite;
         }
 
+        /**
+         * Gets the serial number of the selected device.
+         * 
+         * @return {@link String} - representing the selected device serial number
+         */
         public String getSelectedDevice() {
             return mDevices.get(sSelectedDeviceIndex).getKey();
         }
+
     }
 }
