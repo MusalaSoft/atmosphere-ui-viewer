@@ -16,8 +16,6 @@
 
 package com.android.uiautomator;
 
-import java.io.File;
-
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
@@ -32,6 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
 import com.android.uiautomator.actions.OpenFilesAction;
+import com.android.uiautomator.actions.RemoteControlAction;
 import com.android.uiautomator.actions.ScreenshotAction;
 
 public class UiAutomatorViewer extends ApplicationWindow {
@@ -59,6 +58,7 @@ public class UiAutomatorViewer extends ApplicationWindow {
 
         toolBarManager.add(new OpenFilesAction(this));
         toolBarManager.add(new ScreenshotAction(this, false));
+        toolBarManager.add(new RemoteControlAction(this));
         // toolBarManager.add(new ScreenshotAction(this,true));
         // toolBarManager.add(new SaveScreenShotAction(this));
         ToolBar tb = toolBarManager.createControl(c);
@@ -98,24 +98,20 @@ public class UiAutomatorViewer extends ApplicationWindow {
         return new Point(800, 600);
     }
 
-    public void setModel(final UiAutomatorModel model, final File modelFile, final Image screenshot) {
+    public void setModel(final UiAutomatorModel model, final Image screenshot) {
         if (Display.getDefault().getThread() != Thread.currentThread()) {
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    mUiAutomatorView.setModel(model, modelFile, screenshot);
+                    mUiAutomatorView.setUiHierarchyModel(model, screenshot);
                 }
             });
         } else {
-            mUiAutomatorView.setModel(model, modelFile, screenshot);
+            mUiAutomatorView.setUiHierarchyModel(model, screenshot);
         }
     }
 
-    public Image getScreenShot() {
-        return mUiAutomatorView.getScreenShot();
-    }
-
-    public File getModelFile() {
-        return mUiAutomatorView.getModelFile();
+    public void setRemoteControlModel(String deviceSN) {
+        mUiAutomatorView.setRemoteControlModel(deviceSN);
     }
 }
