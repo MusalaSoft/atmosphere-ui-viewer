@@ -78,6 +78,6 @@ public class OpenFilesAction extends Action {
             }
         }
 
-        mViewer.setModel(model, d.getXmlDumpFile(), img);
+        mViewer.setModel(model, img);
     }
 }

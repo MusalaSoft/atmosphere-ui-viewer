@@ -1,0 +1,23 @@
+language: java
+jdk: oraclejdk7
+os: linux
+
+cache:
+    directories:
+        - $HOME/.gradle
+
+install:
+    - chmod +x gradlew
+    - git clone https://github.com/MusalaSoft/atmosphere-commons.git
+    - git clone https://github.com/MusalaSoft/atmosphere-client-server-lib.git
+    - git clone https://github.com/MusalaSoft/atmosphere-client.git
+    - chmod +x travis-scripts/branch-checkout.sh
+    - cd atmosphere-commons && ../travis-scripts/branch-checkout.sh
+    - ./gradlew build publishToMavenLocal && cd ..
+    - cd atmosphere-client-server-lib && ../travis-scripts/branch-checkout.sh
+    - ./gradlew build publishToMavenLocal && cd ..
+    - cd atmosphere-client && ../travis-scripts/branch-checkout.sh
+    - ./gradlew build publishToMavenLocal && cd ..
+
+script:
+    - ./gradlew build
