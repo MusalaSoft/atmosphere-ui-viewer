@@ -32,6 +32,9 @@ import org.eclipse.swt.widgets.ToolBar;
 import com.android.uiautomator.actions.OpenFilesAction;
 import com.android.uiautomator.actions.RemoteControlAction;
 import com.android.uiautomator.actions.ScreenshotAction;
+import com.musala.atmosphere.client.util.ConfigurationPropertiesLoader;
+import com.musala.atmosphere.client.util.ServerConnectionProperties;
+import com.musala.atmosphere.client.websocket.ClientDispatcher;
 
 public class UiAutomatorViewer extends ApplicationWindow {
     private UiAutomatorView mUiAutomatorView;
@@ -72,6 +75,11 @@ public class UiAutomatorViewer extends ApplicationWindow {
 
     public static void main(String args[]) {
         DebugBridge.init();
+
+        ServerConnectionProperties serverConnectionProperties = new ServerConnectionProperties(ConfigurationPropertiesLoader.getServerIp(),
+                                                                                               ConfigurationPropertiesLoader.getServerPort(),
+                                                                                               ConfigurationPropertiesLoader.getConnectionRetries());
+        ClientDispatcher.getInstance().connectToServer(serverConnectionProperties);
 
         try {
             UiAutomatorViewer window = new UiAutomatorViewer();

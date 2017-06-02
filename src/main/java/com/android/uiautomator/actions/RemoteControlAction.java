@@ -18,11 +18,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import com.android.uiautomator.UiAutomatorViewer;
-import com.musala.atmosphere.client.ServerConnectionHandler;
 import com.musala.atmosphere.client.uiutils.ViewerCommunicator;
-import com.musala.atmosphere.client.util.ServerConnectionProperties;
 import com.musala.atmosphere.commons.util.Pair;
-import com.musala.atmosphere.commons.util.PropertiesLoader;
 
 /**
  * Class representing the remote control action. This class is extending the jface {@link Action} class.
@@ -35,8 +32,6 @@ public class RemoteControlAction extends Action {
 
     private ViewerCommunicator vCommunicator;
 
-    private ServerConnectionHandler serverConnectionHandler;
-
     /**
      * Creates the remote control action by given {@link UiAutomatorViewer}.
      * 
@@ -48,14 +43,6 @@ public class RemoteControlAction extends Action {
         mViewer = viewer;
 
         vCommunicator = new ViewerCommunicator();
-
-        PropertiesLoader loader = PropertiesLoader.getInstance("config.properties");
-
-        ServerConnectionProperties serverConnectionProperties = new ServerConnectionProperties(loader.getPropertyString("server.ip"),
-                                                                                               Integer.parseInt(loader.getPropertyString("server.port")),
-                                                                                               0);
-        serverConnectionHandler = new ServerConnectionHandler(serverConnectionProperties);
-        serverConnectionHandler.connect();
     }
 
     @Override
