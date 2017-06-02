@@ -40,11 +40,8 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.android.uiautomator.UiAutomatorModel;
 import com.android.uiautomator.UiAutomatorViewer;
-import com.musala.atmosphere.client.ServerConnectionHandler;
 import com.musala.atmosphere.client.uiutils.ViewerCommunicator;
-import com.musala.atmosphere.client.util.ServerConnectionProperties;
 import com.musala.atmosphere.commons.util.Pair;
-import com.musala.atmosphere.commons.util.PropertiesLoader;
 
 public class ScreenshotAction extends Action {
     UiAutomatorViewer mViewer;
@@ -53,8 +50,6 @@ public class ScreenshotAction extends Action {
 
     private ViewerCommunicator vCommunicator;
 
-    private ServerConnectionHandler serverConnectionHandler;
-
     public ScreenshotAction(UiAutomatorViewer viewer, boolean compressed) {
         super("&Device Screenshot " + (compressed ? "with Compressed Hierarchy" : "") + "(uiautomator dump"
                 + (compressed ? " --compressed)" : ")"));
@@ -62,14 +57,6 @@ public class ScreenshotAction extends Action {
         mCompressed = compressed;
 
         vCommunicator = new ViewerCommunicator();
-
-        PropertiesLoader loader = PropertiesLoader.getInstance("config.properties");
-
-        ServerConnectionProperties serverConnectionProperties = new ServerConnectionProperties(loader.getPropertyString("server.ip"),
-                                                                                               Integer.parseInt(loader.getPropertyString("server.port")),
-                                                                                               0);
-        serverConnectionHandler = new ServerConnectionHandler(serverConnectionProperties);
-        serverConnectionHandler.connect();
     }
 
     @Override
