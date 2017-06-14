@@ -1,6 +1,9 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.internal.os.OperatingSystem;
+
 version = '0.0.1'
 mainClassName = 'com.android.uiautomator.UiAutomatorViewer'
 
@@ -29,11 +32,20 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     compile 'org.javassist:javassist:3.18.2-GA'
     compile 'org.reflections:reflections:0.9.9-RC1'
-    compile group: 'org.eclipse.core', name: 'commands', version: '3.3.0-I20070605-0010'
-    compile group: 'com.google.android', name: 'support-v4', version: 'r7'
-    compile group: 'org.eclipse', name: 'jface', version: '3.3.0-I20070606-0010'
-    compile group: 'org.eclipse.equinox', name: 'org.eclipse.equinox.common', version: '3.6.0'
-    compile group: 'org.eclipse', name: 'swt.win32.win32.x86_64', version: '3.6.1.v3655c'
+    
+    compile 'org.eclipse.core:commands:3.3.0-I20070605-0010'
+    compile 'com.google.android:support-v4:r7'
+    compile 'org.eclipse:jface:3.3.0-I20070606-0010'
+    compile 'org.eclipse.equinox:org.eclipse.equinox.common:3.6.0'
+
+    if (OperatingSystem.current().isWindows()) {
+        compile 'org.eclipse:swt.win32.win32.x86_64:3.6.1.v3655c'
+    } else if (OperatingSystem.current().isLinux()) {
+        compile 'org.eclipse.swt.gtk.linux:x86_64:3.3.0-v3346'
+    } else {
+        throw new Exception(OperatingSystem.current().toString() + " is not supported.")
+    }
+
     compile 'commons-logging:commons-logging:1.2'
     compile 'com.musala.atmosphere:atmosphere-client-server-lib:0.+'
     compile 'com.musala.atmosphere:atmosphere-client:0.+'
