@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/MusalaSoft/atmosphere-ui-viewer.svg?branch=master)](https://travis-ci.org/MusalaSoft/atmosphere-ui-viewer) [![Download](https://api.bintray.com/packages/musala/atmosphere/atmosphere-ui-viewer/images/download.svg?version=0.0.1)](https://bintray.com/musala/atmosphere/atmosphere-ui-viewer/0.0.1/link)  
 See our site for better context of this readme. [Click here](http://atmosphereframework.com/)
 
 # atmosphere-ui-viewer
